@@ -27,7 +27,7 @@ const drag = simulation => {
     .on('end', dragended)
 }
 
-const color = type => {
+const mapColor = type => {
   // @see https://github.com/kcwikizh/kcdata/wiki/Quest
   const defaultColor = '#111'
   const colorMap = {
@@ -47,13 +47,33 @@ const color = type => {
   return colorMap[type]
 }
 
+/**
+ * update position
+ */
+const updateLink = link =>
+  link
+    .attr('x1', d => d.source.x)
+    .attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x)
+    .attr('y2', d => d.target.y)
+
+const updateNode = node =>
+  node.attr('transform', d => `translate(${d.x}, ${d.y})`)
+// node.attr('cx', d => d.x).attr('cy', d => d.y)
+
+const updateNodeText = nodesText =>
+  nodesText.attr('x', d => d.x).attr('y', d => d.y)
+
+/**
+ * draw chart
+ */
 const chart = ({ width, height }) => {
-  const links = questLinks
-  const nodes = questNodes
+  const linksData = questLinks
+  const nodesData = questNodes
 
   const simulation = d3
-    .forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id(d => d.game_id))
+    .forceSimulation(nodesData)
+    .force('link', d3.forceLink(linksData).id(d => d.game_id))
     .force('charge', d3.forceManyBody())
     .force('center', d3.forceCenter(width / 2, height / 2))
 
@@ -64,7 +84,7 @@ const chart = ({ width, height }) => {
 
   const nodesText = svg
     .selectAll('.nodetext')
-    .data(nodes)
+    .data(nodesData)
     .enter()
     .append('text')
     .attr('class', 'nodetext')
@@ -77,7 +97,7 @@ const chart = ({ width, height }) => {
     .attr('stroke', '#999')
     .attr('stroke-opacity', 0.6)
     .selectAll('line')
-    .data(links)
+    .data(linksData)
     .join('line')
     .attr('stroke-width', d => Math.sqrt(d.value))
 
@@ -86,25 +106,18 @@ const chart = ({ width, height }) => {
     .attr('stroke', '#fff')
     .attr('stroke-width', 1.5)
     .selectAll('circle')
-    .data(nodes)
+    .data(nodesData)
     .join('circle')
     .attr('r', 10)
-    .attr('fill', d => color(d.category))
+    .attr('fill', d => mapColor(d.category))
     .call(drag(simulation))
 
   node.append('title').text(d => d.name)
 
   simulation.on('tick', () => {
-    link
-      .attr('x1', d => d.source.x)
-      .attr('y1', d => d.source.y)
-      .attr('x2', d => d.target.x)
-      .attr('y2', d => d.target.y)
-
-    node.attr('cx', d => d.x).attr('cy', d => d.y)
-
-    nodesText.attr('x', d => d.x)
-    nodesText.attr('y', d => d.y)
+    updateLink(link)
+    updateNode(node)
+    updateNodeText(nodesText)
   })
 
   return svg.node()
