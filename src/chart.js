@@ -74,10 +74,15 @@ const chart = ({ width, height }) => {
   const simulation = d3
     .forceSimulation(nodesData)
     .force('link', d3.forceLink(linksData).id(d => d.game_id))
-    .force('charge', d3.forceManyBody())
-    .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('charge', d3.forceManyBody().strength(-250))
+    // positioning forces
+    .force('x', d3.forceX())
+    .force('y', d3.forceY())
+  // .force('center', d3.forceCenter(0, 0))
 
-  const svg = d3.create('svg').attr('viewBox', [0, 0, width, height])
+  const svg = d3
+    .create('svg')
+    .attr('viewBox', [-width / 2, -height / 2, width, height])
   const container = svg.append('g')
 
   const text_dx = -20
