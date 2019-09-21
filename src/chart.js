@@ -68,6 +68,12 @@ const updateNodeText = nodesText =>
  * draw chart
  */
 const chart = ({ width, height }) => {
+  const nodeRadius = 10
+  const markerWidth = 6
+  const markerHeight = 6
+  const refX = 28
+  const refY = 0
+
   const linksData = questLinks
   const nodesData = questNodes
 
@@ -85,10 +91,31 @@ const chart = ({ width, height }) => {
     .attr('viewBox', [-width / 2, -height / 2, width, height])
   const container = svg.append('g')
 
-  const text_dx = -20
-  const text_dy = 20
+  /**
+   * arrowhead
+   */
+  svg
+    .append('defs')
+    .selectAll('marker')
+    .data(['arrowhead'])
+    .enter()
+    .append('marker')
+    .attr('id', String)
+    .attr('viewBox', '0 -5 10 10')
+    .attr('refX', refX)
+    .attr('refY', refY)
+    .attr('markerWidth', markerWidth)
+    .attr('markerHeight', markerHeight)
+    .attr('orient', 'auto')
+    .append('path')
+    .attr('d', 'M0,-5L10,0L0,5')
+    .attr('fill', '#999')
+
+  const text_dx = -40
+  const text_dy = 22
 
   const nodesText = container
+    .append('g')
     .selectAll('.nodetext')
     .data(nodesData)
     .enter()
@@ -105,7 +132,7 @@ const chart = ({ width, height }) => {
     .selectAll('line')
     .data(linksData)
     .join('line')
-    .attr('stroke-width', d => Math.sqrt(d.value))
+    .attr('marker-end', 'url(#arrowhead)')
 
   const node = container
     .append('g')
@@ -114,7 +141,7 @@ const chart = ({ width, height }) => {
     .selectAll('circle')
     .data(nodesData)
     .join('circle')
-    .attr('r', 10)
+    .attr('r', nodeRadius)
     .attr('fill', d => mapColor(d.category))
     .call(drag(simulation))
 
