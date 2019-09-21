@@ -78,11 +78,12 @@ const chart = ({ width, height }) => {
     .force('center', d3.forceCenter(width / 2, height / 2))
 
   const svg = d3.create('svg').attr('viewBox', [0, 0, width, height])
+  const container = svg.append('g')
 
   const text_dx = -20
   const text_dy = 20
 
-  const nodesText = svg
+  const nodesText = container
     .selectAll('.nodetext')
     .data(nodesData)
     .enter()
@@ -92,7 +93,7 @@ const chart = ({ width, height }) => {
     .attr('dy', text_dy)
     .text(d => d.name)
 
-  const link = svg
+  const link = container
     .append('g')
     .attr('stroke', '#999')
     .attr('stroke-opacity', 0.6)
@@ -101,7 +102,7 @@ const chart = ({ width, height }) => {
     .join('line')
     .attr('stroke-width', d => Math.sqrt(d.value))
 
-  const node = svg
+  const node = container
     .append('g')
     .attr('stroke', '#fff')
     .attr('stroke-width', 1.5)
@@ -119,6 +120,15 @@ const chart = ({ width, height }) => {
     updateNode(node)
     updateNodeText(nodesText)
   })
+
+  svg.call(
+    d3
+      .zoom()
+      .scaleExtent([0.5, 4])
+      .on('zoom', function() {
+        container.attr('transform', d3.event.transform)
+      }),
+  )
 
   return svg.node()
 }
