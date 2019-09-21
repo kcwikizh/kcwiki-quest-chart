@@ -59,6 +59,19 @@ const chart = ({ width, height }) => {
 
   const svg = d3.create('svg').attr('viewBox', [0, 0, width, height])
 
+  const text_dx = -20
+  const text_dy = 20
+
+  const nodesText = svg
+    .selectAll('.nodetext')
+    .data(nodes)
+    .enter()
+    .append('text')
+    .attr('class', 'nodetext')
+    .attr('dx', text_dx)
+    .attr('dy', text_dy)
+    .text(d => d.name)
+
   const link = svg
     .append('g')
     .attr('stroke', '#999')
@@ -78,19 +91,6 @@ const chart = ({ width, height }) => {
     .attr('r', 10)
     .attr('fill', d => color(d.category))
     .call(drag(simulation))
-
-  const text_dx = -20
-  const text_dy = 20
-
-  const nodesText = svg
-    .selectAll('.nodetext')
-    .data(nodes)
-    .enter()
-    .append('text')
-    .attr('class', 'nodetext')
-    .attr('dx', text_dx)
-    .attr('dy', text_dy)
-    .text(d => d.name)
 
   node.append('title').text(d => d.name)
 
