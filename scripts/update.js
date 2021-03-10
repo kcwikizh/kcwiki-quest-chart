@@ -3,7 +3,7 @@ import fetch from 'node-fetch'
 
 import { resolvePath } from './utils'
 
-const dataUrl = 'https://kcwikizh.github.io/kcdata/quest/poi.json'
+const dataUrl = 'https://kcwikizh.github.io/kcwiki-quest-data/data.json'
 
 async function main() {
   ensureDirSync(resolvePath('./data'))
